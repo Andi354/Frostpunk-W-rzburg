@@ -28,3 +28,10 @@
 - E: the bar badge shows 1 when no research runs and a staffed workshop exists ("nothing is researched" read as "nothing in progress")
 - E: a started technology logs 'Forschung beginnt: <name>' (info); tab ids of the research sheet are the German category names
 - E: removed the unused `population` helper from `test/e-research.test.ts` (tsc `noUnusedLocals` would fail the build; no test changed)
+- F: Kinderhort: with the law children fill only the engineer slots of sanitaet and werkstatt (0.5 each); Kinderarbeit keeps them to worker slots (0.6); "allowed there only" read as these two buildings, not every engineer slot
+- F: the Volksküche ratio multiplies the rations it produces (1.25 Wassersuppe, 1.5 Ersatzkost), the food input stays as it was; the cell sheet's hourly figures follow the same factor
+- F: the Stadtkommandant cap (discontent 80) and the Bischofsstadt floor (hope 20) live in the hourly mood of people.ts, next to the other mood terms
+- F: `sign` clamps hope and discontent to 0–100 after its one-off change (Kiliansfest would otherwise overshoot)
+- F: a missing flag (Fringsen before the event) reads 'Noch nicht möglich'; the Fringsen coal comes at 08:00 whenever the law is in force, the flag only gates signing
+- F: the laws sheet lists the effects from the data ("Sofort: …", "Jede Stunde: …") under each description; the Gesetze badge shows 1 while any law can be signed
+- F: test change: the table fill of `LAW_MOOD` removed: "adds the hourly values of the signed laws" in `test/d-people.test.ts` now relies on the real law data (ersatzkost, notschicht, andacht carry the same values), the `LAW_MOOD` import and its cleanup are gone

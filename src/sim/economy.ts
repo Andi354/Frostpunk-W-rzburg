@@ -16,6 +16,23 @@ const TECH_FACTORS: [tech: string, type: string, factor: number][] = [
   ['fallen', 'jagdhuette', 1.4],
 ];
 
+/** Buildings where children may work under the Kinderhort law (at half strength). */
+const KINDERHORT_SLOTS = ['sanitaet', 'werkstatt'];
+
+/** Children fill slots under Kinderarbeit (worker slots only) or under Kinderhort (sanitaet and werkstatt). */
+export function childrenAllowed(s: GameState, type: string): boolean {
+  if (hasLaw(s, 'kinderhort') && KINDERHORT_SLOTS.includes(type)) return true;
+  return hasLaw(s, 'kinderarbeit') && def(type).staff !== 'engineer';
+}
+
+/** Rations per food of the kitchen: 1 by default, 1.25 with Wassersuppe, 1.5 with Ersatzkost. */
+function kitchenFactor(s: GameState, type: string, resource: ResourceId): number {
+  if (type !== 'kueche' || resource !== 'rations') return 1;
+  if (hasLaw(s, 'ersatzkost')) return 1.5;
+  if (hasLaw(s, 'suppe')) return 1.25;
+  return 1;
+}
+
 // ── placing and demolishing ──────────────────────────────────────────────
 
 /** German reason why a building cannot be placed here, or null. */
@@ -75,7 +92,7 @@ function removeBuilding(s: GameState, b: Building): void {
 /** Healthy people without a job who are in the city (not on an expedition). */
 export function idle(s: GameState, kind?: PersonKind): Person[] {
   const away = new Set(s.expeditions.flatMap((e) => e.members));
-  const children = hasLaw(s, 'kinderarbeit');
+  const children = hasLaw(s, 'kinderarbeit') || hasLaw(s, 'kinderhort');
   return s.people.filter(
     (p) =>
       p.health === 'ok' &&
@@ -88,7 +105,7 @@ export function idle(s: GameState, kind?: PersonKind): Person[] {
 
 /** Staffing order: engineers only for engineer slots, otherwise workers, then engineers, then children. */
 function staffOrder(staff: string): PersonKind[] {
-  return staff === 'engineer' ? ['engineer'] : ['worker', 'engineer', 'child'];
+  return staff === 'engineer' ? ['engineer', 'child'] : ['worker', 'engineer', 'child'];
 }
 
 /** +delta takes idle people into the slots, −delta releases the last assigned. Returns the actual change. */
@@ -106,6 +123,7 @@ export function assign(s: GameState, buildingId: number, delta: number): number 
       for (const p of pool) {
         if (added >= want) break;
         if (p.kind !== kind) continue;
+        if (kind === 'child' && !childrenAllowed(s, b.type)) continue;
         p.job = b.id;
         b.workers.push(p.id);
         added++;
@@ -124,13 +142,14 @@ export function assign(s: GameState, buildingId: number, delta: number): number 
   return 0;
 }
 
-/** People who work in the building now: healthy, children count 0.6, amputees 0.5. */
+/** People who work in the building now: healthy, children count 0.6 (0.5 in the Kinderhort), amputees 0.5. */
 function workingPeople(s: GameState, b: Building): number {
+  const childShare = hasLaw(s, 'kinderhort') && KINDERHORT_SLOTS.includes(b.type) ? 0.5 : 0.6;
   let n = 0;
   for (const id of b.workers) {
     const p = s.people.find((x) => x.id === id);
     if (!p || p.health !== 'ok') continue;
-    n += (p.kind === 'child' ? 0.6 : 1) * (p.amputee ? 0.5 : 1);
+    n += (p.kind === 'child' ? childShare : 1) * (p.amputee ? 0.5 : 1);
   }
   return n;
 }
@@ -143,7 +162,7 @@ export function hourlyYield(s: GameState, b: Building): Partial<Record<ResourceI
   const out: Partial<Record<ResourceId, number>> = {};
   if (b.built < 1) return out;
   const k = workingPeople(s, b) * efficiency(s, b);
-  for (const [r, per] of Object.entries(d.pileYield ?? d.produces ?? {}) as [ResourceId, number][]) out[r] = per * k;
+  for (const [r, per] of Object.entries(d.pileYield ?? d.produces ?? {}) as [ResourceId, number][]) out[r] = per * k * kitchenFactor(s, b.type, r);
   for (const [r, per] of Object.entries(d.consumes ?? {}) as [ResourceId, number][]) out[r] = (out[r] ?? 0) - per * k;
   if (d.coalPerHour && b.on) out.coal = (out.coal ?? 0) - d.coalPerHour;
   return out;
@@ -214,7 +233,7 @@ function convert(s: GameState, d: BuildingDef, k: number): void {
   for (const [r, per] of consumes) scale = Math.min(scale, s.res[r] / (per * k));
   scale = Math.max(0, scale);
   for (const [r, per] of consumes) s.res[r] -= per * k * scale;
-  for (const [r, per] of produces) s.res[r] += per * k * scale;
+  for (const [r, per] of produces) s.res[r] += per * k * scale * kitchenFactor(s, d.id, r);
 }
 
 /** Piles yield per worker-hour and shrink by what they give; an empty pile is removed. */

@@ -3,19 +3,11 @@ import { BUILDINGS, def, type BuildingDef } from '../../sim/data/buildings';
 import { canPlace, placeBuilding } from '../../sim/economy';
 import { TECHS } from '../../sim/data/techs';
 import { hasTech } from '../../sim/heat';
+import { LAWS } from '../../sim/data/laws';
 import { hasLaw } from '../../sim/util';
 import type { GameState } from '../../sim/types';
 import { ACTIONS, BAR, HOOKS, PANELS, esc, type App } from '../app';
 import { icon } from '../icons';
-
-/** Names of laws that buildings wait for. Step F replaces this with the law data. */
-const LAW_NAMES: Record<string, string> = {
-  friedhof: 'Friedhof am Galgenberg',
-  weinausschank: 'Weinausschank',
-  kinderhort: 'Kinderhort',
-  buergerwehr: 'Bürgerwehr',
-  notkapelle: 'Notkapelle',
-};
 
 const TABS = [
   { id: 'housing', label: 'Wohnen' },
@@ -30,7 +22,7 @@ const TABS = [
 /** Why a card is locked (research, law, unique), or null. */
 function lockLine(s: GameState, d: BuildingDef): string | null {
   if (d.requires && !hasTech(s, d.requires)) return `Erforschen: ${TECHS[d.requires]?.name ?? d.requires}`;
-  if (d.requiresLaw && !hasLaw(s, d.requiresLaw)) return `Gesetz: ${LAW_NAMES[d.requiresLaw] ?? d.requiresLaw}`;
+  if (d.requiresLaw && !hasLaw(s, d.requiresLaw)) return `Gesetz: ${LAWS[d.requiresLaw]?.name ?? d.requiresLaw}`;
   if (d.unique && s.buildings.some((b) => b.type === d.id)) return 'Nur einmal erlaubt';
   return null;
 }

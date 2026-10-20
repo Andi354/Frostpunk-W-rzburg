@@ -4,7 +4,7 @@ import { GRID } from '../src/sim/grid';
 import { heatLevel, cellTemp, plazaTemp } from '../src/sim/heat';
 import { addBuilding, addPerson, newGame } from '../src/sim/state';
 import { assign } from '../src/sim/economy';
-import { LAW_MOOD, assignHomes, careCapacity, census, homeTemp, peopleHour } from '../src/sim/people';
+import { assignHomes, careCapacity, census, homeTemp, peopleHour } from '../src/sim/people';
 import type { Building, GameState, Person, PersonKind } from '../src/sim/types';
 
 // Randomness is only ever drawn through chance(s, p). The tests decide every roll themselves and record
@@ -891,20 +891,11 @@ describe('mood', () => {
     calmCity(s, 20);
     mid(s);
     const plain = delta(s);
-    // the per-hour values come with the law data (step F); here the table is filled by the test
-    LAW_MOOD.ersatzkost = { discontent: 0.03 };
-    LAW_MOOD.notschicht = { discontent: 0.08 };
-    LAW_MOOD.andacht = { hope: 0.05 };
-    try {
-      s.laws.signed.push('ersatzkost', 'notschicht'); // discontent +0.03 and +0.08 per hour
-      expect(delta(s).disc - plain.disc).toBeCloseTo(0.11, 3);
-      s.laws.signed.push('andacht'); // hope +0.05 per hour
-      expect(delta(s).hope - plain.hope).toBeCloseTo(0.05, 3);
-    } finally {
-      delete LAW_MOOD.ersatzkost;
-      delete LAW_MOOD.notschicht;
-      delete LAW_MOOD.andacht;
-    }
+    // the per-hour values come with the law data: ersatzkost +0.03 and notschicht +0.08 discontent, andacht +0.05 hope
+    s.laws.signed.push('ersatzkost', 'notschicht'); // discontent +0.03 and +0.08 per hour
+    expect(delta(s).disc - plain.disc).toBeCloseTo(0.11, 3);
+    s.laws.signed.push('andacht'); // hope +0.05 per hour
+    expect(delta(s).hope - plain.hope).toBeCloseTo(0.05, 3);
   });
 });
 

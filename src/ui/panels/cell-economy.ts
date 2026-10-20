@@ -1,6 +1,5 @@
 import { def } from '../../sim/data/buildings';
-import { assign, demolish, hourlyYield, idle } from '../../sim/economy';
-import { hasLaw } from '../../sim/util';
+import { assign, childrenAllowed, demolish, hourlyYield, idle } from '../../sim/economy';
 import { RESOURCE_NAMES, type Building, type ResourceId } from '../../sim/types';
 import { ACTIONS, type App } from '../app';
 import { CELL_SECTIONS } from './cell';
@@ -13,11 +12,11 @@ function workers(app: App, b: Building | undefined): string {
   if (!b) return '';
   const d = def(b.type);
   if (!d.slots || b.built < 1) return '';
-  const pool = idle(app.s).filter((p) => d.staff !== 'engineer' || p.kind === 'engineer');
+  const pool = idle(app.s).filter((p) => (p.kind === 'child' ? childrenAllowed(app.s, b.type) : d.staff !== 'engineer' || p.kind === 'engineer'));
   const free = (kind: string) => idle(app.s).filter((p) => p.kind === kind).length;
   const full = b.workers.length >= d.slots;
   const staffLine = [`${free('worker')} Arbeiter`, `${free('engineer')} Fachkräfte`];
-  if (hasLaw(app.s, 'kinderarbeit')) staffLine.push(`${free('child')} Kinder`);
+  if (childrenAllowed(app.s, b.type)) staffLine.push(`${free('child')} Kinder`);
   return `<div>
     <div class="label">Besetzung</div>
     <div class="row" style="margin-top:6px">

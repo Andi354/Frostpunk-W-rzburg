@@ -272,6 +272,8 @@ button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
 
 .hint { font-size: 13px; color: var(--frost-dim); line-height: 1.4; }
 .hint b { color: var(--frost); }
+/* official notice: a paper strip above the cards (laws) */
+.notice { background: var(--paper); color: var(--paper-ink); border-radius: 3px; padding: 10px 14px; font-family: var(--f-doc); font-size: 14px; line-height: 1.45; border-top: 4px solid var(--paper-ink); }
 
 @media (min-width: 720px) {
   .sheet { left: auto; right: var(--gutter-r); bottom: 84px; width: 440px; border-radius: 14px; border: 1px solid var(--brass); max-height: calc(100% - 200px); }
