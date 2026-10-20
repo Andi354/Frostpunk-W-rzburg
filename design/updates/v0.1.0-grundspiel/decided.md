@@ -60,3 +60,9 @@
 - I: balance: sickness rates unchanged (SICK_RISK, 1/48, 1/200, 1/36 are step D's spec and tests; lowering the 1/36 death rate broke seven step D tests)
 - I: test/balance.test.ts bot fixed (no change to its thresholds or the idle bot): engineers went to worker slots, so the Werkstatt and Sanitätsstation never got staff and no research ever finished; now the engineer buildings are staffed first
 - I: test/balance.test.ts bot: food and wood workers only while the stock is below 200 (kitchen below 150 rations), the people go to coal otherwise (food reached 1,400 and wood 575 unused); staffing is redone every hour
+- J: the menu also has the spec's Tempo line (the task list left it out); the version line is a constant `v0.1.0` in menu.ts
+- J: „Neues Spiel“ arms its second tap whenever a game is running or a save exists, so one tap cannot end a running game
+- J: autosave every 6 game hours counted from the first hour of the game; leaving or reloading the page also saves; a finished game deletes its save at once; a new game is written as the save at once
+- J: a first-game hint is shown while its check fails (no latch), so a boiler that goes out shows „Kessel anheizen“ again; the dismissal is written to the save at once
+- J: sound starts off and is switched on by „Neues Spiel“ or „Fortsetzen“ (a tap allows the AudioContext); the menu switch shows the current state
+- J: the wind follows `snowIntensity`, the hum follows `s.gen.on`, the bell rings when the pending documents grow

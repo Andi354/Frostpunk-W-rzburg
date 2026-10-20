@@ -128,6 +128,7 @@ export class App {
         </div>
       </div>
       <div class="fab-col">
+        <button class="fab" data-act="open" data-arg="menu" aria-label="Menü">${icon('menu')}</button>
         <button class="fab" data-act="heatView" aria-label="Wärmeansicht" data-el="heatBtn">${icon('heat')}</button>
         <button class="fab" data-act="recenter" aria-label="Zum Kessel">${icon('center')}</button>
       </div>
