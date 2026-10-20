@@ -28,6 +28,7 @@ export interface Building {
   on: boolean; // heaters and other switchable buildings
   amount?: number; // remaining amount for piles
   level?: number;
+  deposit?: string; // deposit kind this building stands on (restored on demolition)
 }
 
 export interface Generator {

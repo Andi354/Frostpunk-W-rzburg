@@ -28,7 +28,30 @@ export interface Visual {
   d?: number; // footprint factor (radial)
 }
 
-export const VISUALS: Record<string, Visual> = {};
+export const VISUALS: Record<string, Visual> = {
+  zelt: { roof: 'tent', wall: '#8b7d62', roofColor: '#b9ab8f' },
+  nissen: { roof: 'nissen', wall: '#6b7379', roofColor: '#e6ecef' },
+  ziegelhaus: { roof: 'gable', wall: '#a35a45', roofColor: '#b9c0c6' },
+  kohlengrube: { roof: 'works', wall: '#4a4440', roofColor: '#5c5652', chimney: true },
+  holzfaeller: { roof: 'gable', wall: '#6b4f36', roofColor: '#7d5c3f' },
+  hangar: { roof: 'works', wall: '#6e7379', roofColor: '#9aa3aa' },
+  truemmerbahn: { roof: 'flat', wall: '#7a716a', roofColor: '#8f867e' },
+  koehlerei: { roof: 'tower', wall: '#4b3f38', roofColor: '#5a4d45', chimney: true },
+  jagdhuette: { roof: 'gable', wall: '#5d4a3a', roofColor: '#6f5a46', w: 0.7, d: 0.7 },
+  kueche: { roof: 'gable', wall: '#8a5d40', roofColor: '#a07558', chimney: true, sign: 'pot', accent: '#d9a441' },
+  gewaechshaus: { roof: 'flat', wall: '#7e9ea3', roofColor: '#cfe3e6', sign: 'glass', accent: '#8fb8bf' },
+  sanitaet: { roof: 'gable', wall: '#8a6f63', roofColor: '#b0a196', sign: 'cross', accent: '#c0392b' },
+  lazarett: { roof: 'flat', wall: '#9a8c83', roofColor: '#c9c0b8', sign: 'cross', accent: '#c0392b' },
+  waermestube: { roof: 'tower', wall: '#7a4b3a', roofColor: '#8a5e4b', chimney: true, sign: 'flame', accent: '#ff8a3d' },
+  werkstatt: { roof: 'works', wall: '#5f5a55', roofColor: '#7d766f', sign: 'gear', accent: '#b8955a' },
+  kundschafter: { roof: 'tower', wall: '#6d6a5c', roofColor: '#8c8772', sign: 'shield', accent: '#b8955a' },
+  funkstation: { roof: 'flat', wall: '#4f5a60', roofColor: '#7a858c', sign: 'antenna', accent: '#e0b060' },
+  friedhof: { roof: 'none', wall: '#5a5550', roofColor: '#7a7470', sign: 'grave', accent: '#d8d2c8' },
+  weinstube: { roof: 'gable', wall: '#7a3e4a', roofColor: '#8e6a5a', sign: 'mug', accent: '#c9a227' },
+  kinderhort: { roof: 'gable', wall: '#8a7e6a', roofColor: '#a79a80', sign: 'book', accent: '#3d6e8c' },
+  wachstube: { roof: 'flat', wall: '#5e6366', roofColor: '#7f868b', sign: 'shield', accent: '#b8955a' },
+  kapelle: { roof: 'gable', wall: '#8c8580', roofColor: '#c4bcb4', sign: 'church', accent: '#6b5a4a' },
+};
 
 function hash(n: number): () => number {
   let x = (n * 2654435761) >>> 0;
@@ -312,6 +335,7 @@ export class Renderer {
     this.updateSmoke(s, byCell, dt);
     this.drawSmoke();
 
+    if (o.validCells) for (const id of o.validCells) this.outlineCell(GRID[id], 'rgba(255, 138, 61, 0.45)', 2);
     if (o.selected !== null) this.outlineCell(GRID[o.selected], 'rgba(255, 138, 61, 0.95)', 3);
 
     // ── screen space ──

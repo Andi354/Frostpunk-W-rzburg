@@ -1,6 +1,6 @@
 import { GRID, cellAt } from '../sim/grid';
 import { advance } from '../sim/sim';
-import type { GameState } from '../sim/types';
+import { RESOURCE_NAMES, type GameState, type Resources, type ResourceId } from '../sim/types';
 import { dayOf, outsideTemp, isStorm, dateLabel } from '../sim/weather';
 import { attachInput, clampCamera, toWorld, type Camera } from './camera';
 import { icon } from './icons';
@@ -52,6 +52,10 @@ export class App {
   heatView = false;
   placing: string | null = null;
   validCells: Set<number> | null = null;
+  /** a button waiting for its second tap, e.g. 'demolish:12' */
+  armed: string | null = null;
+  /** change of each resource during the last game hour */
+  delta: Partial<Resources> = {};
   sheet: { kind: string; arg?: string; tab?: string } | null = null;
   title = true;
   private lastHud = 0;
@@ -144,12 +148,14 @@ export class App {
     }
     this.placing = null;
     this.validCells = null;
+    this.armed = null;
     this.refresh();
   }
 
   closeSheet(): void {
     this.sheet = null;
     this.selected = null;
+    this.armed = null;
     this.refresh();
   }
 
@@ -166,6 +172,7 @@ export class App {
     if (this.title) return;
     const w = toWorld(this.cam, sx, sy);
     const cell = cellAt(w.x, w.y);
+    this.armed = null;
     if (cell === null) {
       if (Math.hypot(w.x, w.y) < 60) {
         this.selected = null;
@@ -193,9 +200,13 @@ export class App {
     if (!force && now - this.lastHud < 250) return;
     this.lastHud = now;
     const s = this.s;
-    const res: [string, keyof GameState['res']][] = [['coal', 'coal'], ['wood', 'wood'], ['steel', 'steel'], ['bricks', 'bricks'], ['food', 'food'], ['rations', 'rations']];
+    const res: ResourceId[] = ['coal', 'wood', 'steel', 'bricks', 'food', 'rations', 'parts'];
     this.els.res.innerHTML = res
-      .map(([ic, k]) => `<div class="res${s.res[k] < 10 ? ' low' : ''}" title="${k}">${icon(ic)}<span class="v">${fmt(s.res[k])}</span></div>`)
+      .map((k) => {
+        const d = Math.round(this.delta[k] ?? 0);
+        const change = d === 0 ? '' : `<span class="d ${d > 0 ? 'pos' : 'neg'}">${d > 0 ? '+' : '−'}${Math.abs(d)}</span>`;
+        return `<div class="res${s.res[k] < 10 ? ' low' : ''}" title="${RESOURCE_NAMES[k]}">${icon(k)}<span class="v">${fmt(s.res[k])}</span>${change}</div>`;
+      })
       .join('');
     const day = dayOf(s.time);
     this.els.clock.innerHTML = `Tag ${day} · ${hhmm(s.time)}<small>${esc(dateLabel(day).replace(' 1946', '').replace(' 1947', ''))}</small>`;
@@ -217,10 +228,16 @@ export class App {
       return `<button data-act="open" data-arg="${b.id}" aria-pressed="${this.sheet?.kind === b.id}">${icon(b.icon)}${esc(b.label)}${n ? `<span class="badge">${n}</span>` : ''}</button>`;
     }).join('');
     this.els.heatBtn.setAttribute('aria-pressed', String(this.heatView));
-    this.els.banner.innerHTML = this.placing
+    const banner = this.placing
       ? `<div class="banner">Freies Feld antippen <button class="btn" data-act="cancelPlace">Abbrechen</button></div>`
       : '';
+    // only replace the markup when it changed, so a button under the finger is not rebuilt every tick
+    if (banner !== this.lastBanner) {
+      this.els.banner.innerHTML = banner;
+      this.lastBanner = banner;
+    }
   }
+  private lastBanner = '';
 
   private renderSheet(): void {
     let html = '';
@@ -269,8 +286,7 @@ export class App {
       this.acc += (SPEEDS[this.speed] * Math.min(100, t - (this.lastT || t))) / 1000;
       while (this.acc >= 1 && !s.events.pending.length && !s.outcome) {
         this.acc -= 1;
-        advance(s, 1);
-        for (const f of this.onHour) f(s);
+        this.hour();
       }
     }
     this.lastT = t;
@@ -295,6 +311,18 @@ export class App {
       visualTime: s.time + (paused ? 0 : Math.min(0.99, this.acc)),
     }, t);
     requestAnimationFrame((tt) => this.frame(tt));
+  }
+  /** One game hour: runs the simulation and remembers the resource change for the HUD. */
+  hour(): void {
+    const s = this.s;
+    const before = { ...s.res };
+    const t0 = s.time;
+    advance(s, 1);
+    if (s.time !== t0) {
+      this.delta = {};
+      for (const k of Object.keys(before) as ResourceId[]) this.delta[k] = s.res[k] - before[k];
+    }
+    for (const f of this.onHour) f(s);
   }
   private lastT = 0;
   private lastPanel = 0;
@@ -328,8 +356,5 @@ export function cellName(id: number): string {
 
 // test hook: advance the simulation directly
 (App.prototype as unknown as { __advance: (h: number) => void }).__advance = function (this: App, h: number) {
-  for (let i = 0; i < h; i++) {
-    advance(this.s, 1);
-    for (const f of this.onHour) f(this.s);
-  }
+  for (let i = 0; i < h; i++) this.hour();
 };
