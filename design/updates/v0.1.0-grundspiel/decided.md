@@ -24,3 +24,7 @@
 - D: 'dead' when nobody lives in the city and no expedition is out; the log line is 'Niemand ist mehr in der Siedlung.'
 - D: the Leute sheet shows the mood causes as plain counts; the untreated count there uses the same care plan as the hour (no separate rule)
 - D: test fixes: "removes the dead person from the workers" read `s.people[1]` after the death shifted the array (now captured before); "pflegestation adds 5" had 12 engineers for 15 clinic slots (three engineers added)
+- E: `canResearch` needs a finished workshop, not a staffed one; an unstaffed workshop accepts a start but makes no progress (speed 0, 'Keine Werkstatt besetzt' on the sheet) (the spec's reason text reads as "no workshop")
+- E: the bar badge shows 1 when no research runs and a staffed workshop exists ("nothing is researched" read as "nothing in progress")
+- E: a started technology logs 'Forschung beginnt: <name>' (info); tab ids of the research sheet are the German category names
+- E: removed the unused `population` helper from `test/e-research.test.ts` (tsc `noUnusedLocals` would fail the build; no test changed)

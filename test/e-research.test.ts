@@ -1,27 +1,18 @@
 import '../src/sim/index';
 import { describe, expect, it } from 'vitest';
 import { GRID } from '../src/sim/grid';
-import { addBuilding, addPerson, newGame } from '../src/sim/state';
+import { addBuilding, newGame } from '../src/sim/state';
 import { stepHour } from '../src/sim/sim';
 import { assign, canPlace, efficiency } from '../src/sim/economy';
 import { TECHS } from '../src/sim/data/techs';
 import { canResearch, researchHour, researchSpeed, startResearch } from '../src/sim/research';
-import type { Building, GameState, PersonKind } from '../src/sim/types';
+import type { Building, GameState } from '../src/sim/types';
 
 // ── helpers ──────────────────────────────────────────────────────────────
 
 function freeCell(s: GameState, ring: number, skip = 0): number {
   const used = new Set(s.buildings.map((b) => b.cell));
   return GRID.filter((c) => c.ring === ring && !used.has(c.id))[skip].id;
-}
-
-function population(s: GameState, workers: number, engineers: number): void {
-  s.people = [];
-  const add = (kind: PersonKind, n: number) => {
-    for (let i = 0; i < n; i++) addPerson(s, kind, 'wue');
-  };
-  add('worker', workers);
-  add('engineer', engineers);
 }
 
 /** A finished workshop on ring 1 with `staff` engineers. */

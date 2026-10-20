@@ -40,7 +40,7 @@ function housing(s: GameState, p: Person): Building | undefined {
 }
 
 /** Share of the slots of a building that are filled by healthy people. */
-function staffedShare(s: GameState, b: Building): number {
+export function staffedShare(s: GameState, b: Building): number {
   const d = def(b.type);
   if (!d.slots || b.built < 1) return 0;
   const healthy = b.workers.filter((id) => s.people.some((p) => p.id === id && p.health === 'ok')).length;
