@@ -54,6 +54,8 @@ function markerState(app: App, site: SiteDef): 'explored' | 'underway' | 'locked
   return why?.startsWith('Erst') ? 'locked' : 'open';
 }
 
+const LABEL_ABOVE = new Set(['ferdinandeum']);
+
 function marker(app: App, site: SiteDef): string {
   const st = markerState(app, site);
   const selected = app.sheet?.arg === site.id;
@@ -65,11 +67,13 @@ function marker(app: App, site: SiteDef): string {
   }[st];
   const cls = st === 'underway' ? ' class="site-underway"' : '';
   const name = site.name.split(' · ')[0];
+  // labels that would run into a neighbouring marker sit above their own
+  const labelY = site.y + (LABEL_ABOVE.has(site.id) ? -4.2 : 6.2);
   const mark = st === 'explored' ? `<text x="${site.x}" y="${site.y + 1.2}" text-anchor="middle" class="map-check">✓</text>` : '';
   return `<g role="button" tabindex="0" aria-label="${esc(site.name)}" data-act="site" data-arg="${site.id}" style="cursor:pointer">
     <circle cx="${site.x}" cy="${site.y}" r="${selected ? 3.6 : 2.8}" style="${style}" stroke-width="${selected ? 1 : 0.7}"${cls}/>
     ${mark}
-    <text x="${site.x}" y="${site.y + 6.2}" text-anchor="middle" class="map-site${st === 'locked' ? ' locked' : ''}">${esc(name)}</text>
+    <text x="${site.x}" y="${labelY}" text-anchor="middle" class="map-site${st === 'locked' ? ' locked' : ''}">${esc(name)}</text>
   </g>`;
 }
 

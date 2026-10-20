@@ -48,14 +48,14 @@ button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
 .hud > * { pointer-events: auto; }
 .res-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; }
 .res {
-  display: flex; align-items: center; gap: 3px; min-width: 0;
+  display: grid; grid-template-columns: 15px minmax(0, 1fr); align-items: center; gap: 2px 3px; min-width: 0;
   font-family: var(--f-ui); font-weight: 600; font-size: 16px; font-variant-numeric: tabular-nums;
   background: rgba(34, 48, 60, 0.6); border-radius: 4px; padding: 3px 4px; line-height: 1;
 }
 .res svg { width: 15px; height: 15px; flex: none; color: var(--frost-dim); }
 .res .v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .res.low .v { color: var(--bad); }
-.res .d { font-size: 11px; font-weight: 500; color: var(--frost-dim); margin-left: auto; }
+.res .d { grid-column: 1 / -1; min-height: 10px; font-size: 10px; font-weight: 500; line-height: 1; text-align: right; color: var(--frost-dim); }
 .res .d.neg { color: var(--bad); }
 .res .d.pos { color: var(--good); }
 
@@ -141,8 +141,9 @@ button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
 .sheet-head .sub { font-family: var(--f-ui); color: var(--frost-dim); font-size: 14px; }
 .sheet-head .close { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--ink-3); display: grid; place-items: center; }
 .sheet-head .close svg { width: 16px; height: 16px; }
-.sheet-body { overflow-y: auto; padding: 12px var(--gutter-r) 16px var(--gutter-l); display: grid; gap: 12px; overscroll-behavior: contain; }
-.tabs { display: flex; gap: 4px; overflow-x: auto; padding: 8px var(--gutter-r) 0 var(--gutter-l); scrollbar-width: none; }
+.sheet-head { flex: none; }
+.sheet-body { min-height: 0; grid-auto-rows: max-content; overflow-y: auto; padding: 12px var(--gutter-r) 16px var(--gutter-l); display: grid; gap: 12px; overscroll-behavior: contain; }
+.tabs { flex: none; display: flex; gap: 4px; overflow-x: auto; padding: 8px var(--gutter-r) 0 var(--gutter-l); scrollbar-width: none; }
 .tabs button {
   border: 1px solid var(--line); background: transparent; border-radius: 16px; padding: 5px 12px; white-space: nowrap;
   font-family: var(--f-ui); font-weight: 600; font-size: 14px; color: var(--frost-dim);

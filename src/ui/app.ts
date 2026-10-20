@@ -205,7 +205,7 @@ export class App {
     this.els.res.innerHTML = res
       .map((k) => {
         const d = Math.round(this.delta[k] ?? 0);
-        const change = d === 0 ? '' : `<span class="d ${d > 0 ? 'pos' : 'neg'}">${d > 0 ? '+' : '−'}${Math.abs(d)}</span>`;
+        const change = d === 0 ? '<span class="d"></span>' : `<span class="d ${d > 0 ? 'pos' : 'neg'}">${d > 0 ? '+' : '−'}${Math.abs(d)}</span>`;
         return `<div class="res${s.res[k] < 10 ? ' low' : ''}" title="${RESOURCE_NAMES[k]}">${icon(k)}<span class="v">${fmt(s.res[k])}</span>${change}</div>`;
       })
       .join('');
