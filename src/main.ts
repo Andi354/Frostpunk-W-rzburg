@@ -4,6 +4,7 @@ import { newGame } from './sim/state';
 import { App } from './ui/app';
 import './ui/panels/title';
 import './ui/panels/boiler';
+import './ui/panels/people';
 import './ui/panels/cell';
 import './ui/panels/build';
 import './ui/panels/cell-economy';

@@ -13,3 +13,14 @@
 - C: `tsconfig.json` excludes `test/pending` so `tsc --noEmit` covers only what the current step has moved in
 - C: locked cards show tech and law names from a small temporary table in `build.ts` until steps E and F bring TECHS and LAWS
 - C: the HUD shows `parts` too, and the resource row flows across columns so seven entries fit
+- D: law hourly mood is a table `LAW_MOOD` (empty until step F fills it from the law data), not a `lawMood` function, so the test can supply values (the test "adds the hourly values" sets three entries itself and removes them again)
+- D: a cared sick person recovers after 18 h when a staffed Lazarett exists, otherwise after 30 h (the spec names the Lazarett value but not the fallback's owner)
+- D: care places are whole patients (floor of the capacity), gravely sick first, then sick by lowest id; the sickness roll of the hour happens before care
+- D: pressure counts only people in the city (expedition members excluded); cold homes count housed people only, so the homeless are not counted twice
+- D: untreated and cared gravely sick who die both count as cause `krankheit`; hunger deaths roll once a day at 19:00 after the meal
+- D: `pflegestation` extra ration is taken only from the patients cared for in that hour
+- D: census kinds, sickness and hunger cover everybody (incl. expedition members, counted as `Unterwegs`); homeless and idle count the city only
+- D: a warning that runs out between the thresholds (revolt 70–85, despair 15–25) ends without outcome
+- D: 'dead' when nobody lives in the city and no expedition is out; the log line is 'Niemand ist mehr in der Siedlung.'
+- D: the Leute sheet shows the mood causes as plain counts; the untreated count there uses the same care plan as the hour (no separate rule)
+- D: test fixes: "removes the dead person from the workers" read `s.people[1]` after the death shifted the array (now captured before); "pflegestation adds 5" had 12 engineers for 15 clinic slots (three engineers added)

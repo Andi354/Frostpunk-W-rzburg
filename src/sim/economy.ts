@@ -124,13 +124,13 @@ export function assign(s: GameState, buildingId: number, delta: number): number 
   return 0;
 }
 
-/** People who work in the building now: healthy, children count 0.6. */
+/** People who work in the building now: healthy, children count 0.6, amputees 0.5. */
 function workingPeople(s: GameState, b: Building): number {
   let n = 0;
   for (const id of b.workers) {
     const p = s.people.find((x) => x.id === id);
     if (!p || p.health !== 'ok') continue;
-    n += p.kind === 'child' ? 0.6 : 1;
+    n += (p.kind === 'child' ? 0.6 : 1) * (p.amputee ? 0.5 : 1);
   }
   return n;
 }
