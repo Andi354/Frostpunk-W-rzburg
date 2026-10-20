@@ -7,6 +7,7 @@ import './ui/panels/boiler';
 import './ui/panels/people';
 import './ui/panels/research';
 import './ui/panels/laws';
+import './ui/panels/map';
 import './ui/panels/cell';
 import './ui/panels/build';
 import './ui/panels/cell-economy';

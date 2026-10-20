@@ -4,3 +4,4 @@ import './economy';
 import './research';
 import './people';
 import './laws';
+import './explore';

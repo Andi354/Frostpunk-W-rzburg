@@ -34,7 +34,6 @@ const countRolls = (p: number) => rng.calls.filter((x) => near(x, p)).length;
 
 const START = 24 * 2 + 8; // day 3, 08:00: no storm
 const STORM = 24 * 29 + 10; // day 30, 10:00
-const stadtIds = () => Object.values(SITES).filter((x) => x.area === 'stadt').map((x) => x.id);
 
 function freeCell(s: GameState, ring: number, skip = 0): number {
   const used = new Set(s.buildings.map((b) => b.cell));
@@ -391,8 +390,8 @@ describe('exploreHour: arrival', () => {
     const s = base();
     const e = dispatch(s, 'bahnhof');
     at(s, e.arriveAt);
-    expect(s.events.pending.map((x) => x.id)).toEqual(['fluechtlingszug']);
-    expect(s.events.fired).toContain('fluechtlingszug');
+    expect(s.events.scheduled).toEqual([{ id: 'fluechtlingszug', at: e.arriveAt }]);
+    expect(s.events.pending).toEqual([]);
   });
 
   it('queues the matching event for other places', () => {
@@ -401,7 +400,7 @@ describe('exploreHour: arrival', () => {
       const s = base();
       const e = dispatch(s, site);
       at(s, e.arriveAt);
-      expect(s.events.pending.map((x) => x.id), site).toEqual([event]);
+      expect(s.events.scheduled.map((x) => x.id), site).toEqual([event]);
     }
   });
 
@@ -411,14 +410,14 @@ describe('exploreHour: arrival', () => {
     const e = dispatch(s, 'rhoen');
     at(s, e.arriveAt);
     expect(s.flags.wasserkuppe).toBeTruthy();
-    expect(s.events.pending.map((x) => x.id)).toContain('sturmwarnung');
+    expect(s.events.scheduled.map((x) => x.id)).toContain('sturmwarnung');
   });
 
   it('a place without an event queues nothing', () => {
     const s = base();
     const e = dispatch(s, 'hublandcenter');
     at(s, e.arriveAt);
-    expect(s.events.pending).toEqual([]);
+    expect(s.events.scheduled).toEqual([]);
   });
 
   it('an event that has already fired is not queued a second time', () => {
@@ -426,7 +425,7 @@ describe('exploreHour: arrival', () => {
     s.events.fired.push('fluechtlingszug');
     const e = dispatch(s, 'bahnhof');
     at(s, e.arriveAt);
-    expect(s.events.pending).toEqual([]);
+    expect(s.events.scheduled).toEqual([]);
   });
 });
 

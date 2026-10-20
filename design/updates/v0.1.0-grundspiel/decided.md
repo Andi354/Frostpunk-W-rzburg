@@ -35,3 +35,13 @@
 - F: a missing flag (Fringsen before the event) reads 'Noch nicht möglich'; the Fringsen coal comes at 08:00 whenever the law is in force, the flag only gates signing
 - F: the laws sheet lists the effects from the data ("Sofort: …", "Jede Stunde: …") under each description; the Gesetze badge shows 1 while any law can be signed
 - F: test change: the table fill of `LAW_MOOD` removed: "adds the hourly values of the signed laws" in `test/d-people.test.ts` now relies on the real law data (ersatzkost, notschicht, andacht carry the same values), the `LAW_MOOD` import and its cleanup are gone
+- G: `src/sim/data/events.ts` is a stub with the five event ids the sites queue (the g-explore test imports `EVENTS` at load); step I replaces the file with the full table
+- G: arrival pushes `{ id, at }` to `s.events.scheduled` as instructed (not `pending`, not `fired`); story consumes it; test/g-explore.test.ts assertions moved from `pending` to `scheduled` because they contradicted that
+- G: one danger roll per member, at arrival only; storm factor (×3) when arrival or return falls on a storm day (spec: "at arrival and return")
+- G: a team that loses all four members brings nothing back (no loot, no survivors), logged as bad
+- G: `residenz` also needs `altstadt` (the spec text says so, the table lists only `festung`); `altstadt` sets `tal_gesehen`, `residenz` sets `hofkeller` and `tal_gesehen` (`SiteDef.flag` may be a list)
+- G: expedition deaths use `kill` from people.ts (now exported): hope −2 like any death, the member leaves the team
+- G: mixed survivors: every third is a child, the others workers (deterministic, no extra randomness)
+- G: markers are grey (locked) only when a prerequisite is missing (`needs`, three city places); other refusals (no post, storm, teams busy) keep the marker open
+- G: map tabs use ids `stadt` / `umland`; marker labels take the name before " · " (long names may overlap, not checked visually)
+- G: test: removed the unused helper `stadtIds` in test/g-explore.test.ts (tsc `noUnusedLocals` fails the build otherwise)

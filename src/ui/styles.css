@@ -129,7 +129,7 @@ button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
   animation: rise 0.18s ease-out;
 }
 @keyframes rise { from { transform: translateY(30px); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .sheet, .modal-card, .toast { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .sheet, .modal-card, .toast, .site-underway { animation: none !important; } }
 .sheet-head {
   display: flex; align-items: center; gap: 10px;
   padding: 12px var(--gutter-r) 8px var(--gutter-l); border-bottom: 1px solid var(--line);
@@ -279,3 +279,12 @@ button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
   .sheet { left: auto; right: var(--gutter-r); bottom: 84px; width: 440px; border-radius: 14px; border: 1px solid var(--brass); max-height: calc(100% - 200px); }
   .bar { left: 50%; right: auto; transform: translateX(-50%); width: 560px; border-radius: 14px 14px 0 0; }
 }
+
+/* map (Karte): labels inside the inline SVG maps */
+.map-label { font-family: var(--f-ui); font-size: 3px; letter-spacing: 0.06em; text-transform: uppercase; fill: var(--frost-dim); }
+.map-label.brass { fill: var(--brass); }
+.map-label.start { text-anchor: start; }
+.map-site { font-family: var(--f-ui); font-size: 2.6px; fill: var(--frost); stroke: var(--ink-2); stroke-width: 0.7px; paint-order: stroke; }
+.map-site.locked { fill: var(--frost-dim); }
+.map-check { font-size: 3.4px; font-weight: 700; fill: var(--ink); }
+.site-underway { animation: pulse 1.4s ease-in-out infinite; }

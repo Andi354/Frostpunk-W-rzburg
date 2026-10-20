@@ -117,7 +117,7 @@ export function carePlan(s: GameState): Set<number> {
   return new Set(patients.slice(0, cap).map((p) => p.id));
 }
 
-function kill(s: GameState, p: Person, cause: string): void {
+export function kill(s: GameState, p: Person, cause: string): void {
   s.people.splice(s.people.indexOf(p), 1);
   for (const b of s.buildings) {
     const i = b.workers.indexOf(p.id);

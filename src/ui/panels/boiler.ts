@@ -19,7 +19,7 @@ PANELS.boiler = (app) => {
   const g = s.gen;
   const coal = genCoalPerHour(s);
   const hours = coal > 0 ? s.res.coal / coal : Infinity;
-  const precise = s.research.done.includes('wetterdienst') ? 5 : 2;
+  const precise = s.research.done.includes('wetterdienst') || s.flags.ausguck ? 5 : 2;
   return {
     title: 'Der Kessel',
     sub: 'Heizwerk im Krater am Hubland',
