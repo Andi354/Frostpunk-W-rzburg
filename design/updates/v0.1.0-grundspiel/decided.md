@@ -66,3 +66,9 @@
 - J: a first-game hint is shown while its check fails (no latch), so a boiler that goes out shows „Kessel anheizen“ again; the dismissal is written to the save at once
 - J: sound starts off and is switched on by „Neues Spiel“ or „Fortsetzen“ (a tap allows the AudioContext); the menu switch shows the current state
 - J: the wind follows `snowIntensity`, the hum follows `s.gen.on`, the bell rings when the pending documents grow
+- Balance: mood, discontent per pressure 1.2 → 0.7 (spec Mood, `DISC_PRESSURE`; unit tests of step D updated)
+- Balance: mood, natural discontent easing 0.15 → 0.25 per hour (`DISC_EASE`)
+- Balance: mood, hope loss per pressure 0.4 → 0.25 (`HOPE_PRESSURE`)
+- Balance: mood, calm-city hope gain 0.05 → 0.08 per hour (`HOPE_CALM`)
+- Balance: unchanged: sickness rates, production, relief, piles (the mood numbers alone met the target; step D's 1/36, 1/48 stay)
+- Balance: `test/balance.test.ts`: sensible bot needs ≥ 60 % alive, mood calm (discontent < 75, hope > 25) in ≥ 80 % of the hours and at least one death; idle bot must lose and last until day 6; new sloppy bot must reach day 20. Before: sensible 72 % alive, idle revolt day 5, sloppy revolt day 5, discontent 83-100 at the end; after: sensible 72 % alive and calm 100 %, idle ends day 6, sloppy lasts to day 32-34

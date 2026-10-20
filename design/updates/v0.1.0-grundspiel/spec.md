@@ -169,8 +169,8 @@ else hunger = 0. Hunger ≥ 3: each day 20 % death chance (cause `hunger`).
 **Mood** each hour, with `pop` = living people in the city:
 ```
 pressure = (homeless + 1.5·hungry + untreated + 0.5·coldHomes) / pop      // coldHomes: home heat level ≤ 1
-discontent += pressure·1.2 − 0.15 − Σrelief/24 + lawDiscontentPerHour
-hope       += (pressure < 0.1 ? 0.05 : −pressure·0.4) + lawHopePerHour + Σkapelle/24
+discontent += pressure·0.7 − 0.25 − Σrelief/24 + lawDiscontentPerHour
+hope       += (pressure < 0.1 ? 0.08 : −pressure·0.25) + lawHopePerHour + Σkapelle/24
 clamp both to [0, 100]
 ```
 Relief: staffed `weinstube` 4/day, `wachstube` 3/day (scaled by staffed fraction). Law per-hour values are listed in step F.
@@ -399,8 +399,10 @@ Show it in the people sheet as „Rückkehrbewegung: n %“.
 Scheduled helper: `s.events.scheduled.push({ id, at })`; `storyHour` queues due entries.
 
 ### Balance target (test `test/balance.test.ts`, written in phase 2)
-A scripted bot using only the public sim API must reach `outcome 'won'` with ≥ 50 % of the start population alive; a bot that
-only lights the boiler and builds nothing must not win with more than 40 % alive. If the bot fails, tune numbers in this order:
+A scripted bot using only the public sim API must reach `outcome 'won'` with ≥ 60 % of the start population alive, with
+discontent < 75 and hope > 25 in at least 80 % of the hours; a bot that only lights the boiler and builds nothing must not win
+with more than 40 % alive and must not lose before day 6; a sloppy bot (builds a day late, no overdrive, no laws, staffs every
+second day) must reach at least day 20. If the bot fails, tune numbers in this order:
 pile amounts, production rates, sickness rates — and list every change in `decided.md`.
 
 ---

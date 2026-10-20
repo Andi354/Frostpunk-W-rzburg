@@ -614,7 +614,7 @@ describe('death', () => {
     const { s } = dyingCity();
     s.hope = 55;
     peopleHour(s);
-    // −2 for the death, plus the small calm-city drift of +0.05
+    // −2 for the death, plus the small calm-city drift of +0.08
     expect(s.hope).toBeGreaterThan(55 - 2.2);
     expect(s.hope).toBeLessThan(55 - 1.8);
   });
@@ -636,7 +636,7 @@ describe('death', () => {
     peopleHour(s);
     expect(s.hope).toBeGreaterThan(55 - 1.2);
     expect(s.hope).toBeLessThan(55 - 0.8);
-    // +0.5 for the death, −0.15 calm drift
+    // +0.5 for the death, −0.25 calm drift
     expect(s.discontent).toBeGreaterThan(30 + 0.2);
     expect(s.discontent).toBeLessThan(30 + 0.5);
   });
@@ -767,8 +767,8 @@ describe('mood', () => {
     calmCity(s, 20);
     mid(s);
     const d = delta(s);
-    expect(d.disc).toBeCloseTo(-0.15, 2);
-    expect(d.hope).toBeCloseTo(0.05, 2);
+    expect(d.disc).toBeCloseTo(-0.25, 2);
+    expect(d.hope).toBeCloseTo(0.08, 2);
   });
 
   it('homeless people raise discontent and lower hope', () => {
@@ -779,8 +779,8 @@ describe('mood', () => {
     s.time = NIGHT;
     mid(s);
     const d = delta(s); // pressure ≥ 1
-    expect(d.disc).toBeGreaterThan(0.9);
-    expect(d.hope).toBeLessThan(-0.3);
+    expect(d.disc).toBeGreaterThan(0.4);
+    expect(d.hope).toBeLessThan(-0.2);
   });
 
   it('hunger counts 1.5 per hungry person', () => {
@@ -789,8 +789,8 @@ describe('mood', () => {
     for (const p of s.people.slice(0, 10)) p.hunger = 1;
     mid(s);
     const d = delta(s); // pressure = 1.5 · 10 / 20
-    expect(d.disc).toBeCloseTo(0.75 * 1.2 - 0.15, 2);
-    expect(d.hope).toBeCloseTo(-0.75 * 0.4, 2);
+    expect(d.disc).toBeCloseTo(0.75 * 0.7 - 0.25, 2);
+    expect(d.hope).toBeCloseTo(-0.75 * 0.25, 2);
   });
 
   it('untreated sick people count', () => {
@@ -799,8 +799,8 @@ describe('mood', () => {
     for (const p of s.people.slice(0, 4)) p.health = 'sick';
     mid(s);
     const d = delta(s); // pressure = 4 / 20
-    expect(d.disc).toBeCloseTo(0.2 * 1.2 - 0.15, 2);
-    expect(d.hope).toBeCloseTo(-0.2 * 0.4, 2);
+    expect(d.disc).toBeCloseTo(0.2 * 0.7 - 0.25, 2);
+    expect(d.hope).toBeCloseTo(-0.2 * 0.25, 2);
   });
 
   it('sick people who are cared for do not count', () => {
@@ -811,7 +811,7 @@ describe('mood', () => {
     for (const p of patients) p.health = 'sick';
     mid(s);
     const d = delta(s);
-    expect(d.disc).toBeCloseTo(-0.15, 2);
+    expect(d.disc).toBeCloseTo(-0.25, 2);
   });
 
   it('homes at heat level 1 or colder count half', () => {
@@ -824,8 +824,8 @@ describe('mood', () => {
     expect(s.people.every((p) => p.home !== null)).toBe(true);
     mid(s);
     const d = delta(s); // pressure = 0.5 · 20 / 20
-    expect(d.disc).toBeCloseTo(0.5 * 1.2 - 0.15, 2);
-    expect(d.hope).toBeCloseTo(-0.5 * 0.4, 2);
+    expect(d.disc).toBeCloseTo(0.5 * 0.7 - 0.25, 2);
+    expect(d.hope).toBeCloseTo(-0.5 * 0.25, 2);
   });
 
   it('discontent and hope stay between 0 and 100', () => {

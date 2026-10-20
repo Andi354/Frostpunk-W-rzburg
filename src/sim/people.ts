@@ -222,6 +222,12 @@ function pressure(m: MoodParts): number {
   return m.pop ? (m.homeless + 1.5 * m.hungry + m.untreated + 0.5 * m.coldHomes) / m.pop : 0;
 }
 
+/** Hourly mood coefficients (spec, Mood): see decided.md `Balance:` for the history. */
+const DISC_PRESSURE = 0.7;
+const DISC_EASE = 0.25;
+const HOPE_PRESSURE = 0.25;
+const HOPE_CALM = 0.08;
+
 function moodHour(s: GameState, cared: Set<number>): void {
   const pr = pressure(moodParts(s, cared));
   let relief = 0;
@@ -235,9 +241,9 @@ function moodHour(s: GameState, cared: Set<number>): void {
   }
   const law = lawHourly(s);
   // Stadtkommandant caps the discontent at 80, Bischofsstadt keeps the hope at 20 or more
-  const disc = s.discontent + pr * 1.2 - 0.15 - relief / 24 + law.discontent;
+  const disc = s.discontent + pr * DISC_PRESSURE - DISC_EASE - relief / 24 + law.discontent;
   s.discontent = clamp(hasLaw(s, 'stadtkommandant') ? Math.min(80, disc) : disc);
-  const hope = s.hope + (pr < 0.1 ? 0.05 : -pr * 0.4) + law.hope + chapel / 24;
+  const hope = s.hope + (pr < 0.1 ? HOPE_CALM : -pr * HOPE_PRESSURE) + law.hope + chapel / 24;
   s.hope = Math.max(hasLaw(s, 'bischofsstadt') ? 20 : 0, clamp(hope));
 }
 
