@@ -1,0 +1,75 @@
+# Decided without design · v0.1.0
+
+- A+B: Generator in a crater on the Hubland, the city lies west below (Tim chose Würzburg, 1946/47)
+- A+B: Stencil display type, condensed figures, typewriter documents (fits 1946 crates and notices)
+- C: deposit building replaces the `dep_*` building; the kind is kept as `Building.deposit` and restored on demolition (the spec's `level = 0` / `amount = undefined` note contradicts this; the field is what the tests check)
+- C: `canPlace` on a pile or deposit returns 'Nicht baubar' (not in the reason list; piles and deposits are never placed)
+- C: `assign` takes people only into finished buildings (an unfinished site has no crew)
+- C: 'any' slots take children after workers and engineers, only with law `kinderarbeit` (same as worker slots)
+- C: dayOnly hunters work in [8, 16), i.e. 08:00 up to 15:59
+- C: heaters (`coalPerHour`) burn coal every hour inside `productionHour`; a heater without coal switches itself off
+- C: a pile's amount drops by the units it yields; the yield is capped by what is left, so an empty pile is removed at once
+- C: a converter scales all its outputs by the same factor as its inputs (kitchen and kiln with short stock)
+- C: `tsconfig.json` excludes `test/pending` so `tsc --noEmit` covers only what the current step has moved in
+- C: locked cards show tech and law names from a small temporary table in `build.ts` until steps E and F bring TECHS and LAWS
+- C: the HUD shows `parts` too, and the resource row flows across columns so seven entries fit
+- D: law hourly mood is a table `LAW_MOOD` (empty until step F fills it from the law data), not a `lawMood` function, so the test can supply values (the test "adds the hourly values" sets three entries itself and removes them again)
+- D: a cared sick person recovers after 18 h when a staffed Lazarett exists, otherwise after 30 h (the spec names the Lazarett value but not the fallback's owner)
+- D: care places are whole patients (floor of the capacity), gravely sick first, then sick by lowest id; the sickness roll of the hour happens before care
+- D: pressure counts only people in the city (expedition members excluded); cold homes count housed people only, so the homeless are not counted twice
+- D: untreated and cared gravely sick who die both count as cause `krankheit`; hunger deaths roll once a day at 19:00 after the meal
+- D: `pflegestation` extra ration is taken only from the patients cared for in that hour
+- D: census kinds, sickness and hunger cover everybody (incl. expedition members, counted as `Unterwegs`); homeless and idle count the city only
+- D: a warning that runs out between the thresholds (revolt 70–85, despair 15–25) ends without outcome
+- D: 'dead' when nobody lives in the city and no expedition is out; the log line is 'Niemand ist mehr in der Siedlung.'
+- D: the Leute sheet shows the mood causes as plain counts; the untreated count there uses the same care plan as the hour (no separate rule)
+- D: test fixes: "removes the dead person from the workers" read `s.people[1]` after the death shifted the array (now captured before); "pflegestation adds 5" had 12 engineers for 15 clinic slots (three engineers added)
+- E: `canResearch` needs a finished workshop, not a staffed one; an unstaffed workshop accepts a start but makes no progress (speed 0, 'Keine Werkstatt besetzt' on the sheet) (the spec's reason text reads as "no workshop")
+- E: the bar badge shows 1 when no research runs and a staffed workshop exists ("nothing is researched" read as "nothing in progress")
+- E: a started technology logs 'Forschung beginnt: <name>' (info); tab ids of the research sheet are the German category names
+- E: removed the unused `population` helper from `test/e-research.test.ts` (tsc `noUnusedLocals` would fail the build; no test changed)
+- F: Kinderhort: with the law children fill only the engineer slots of sanitaet and werkstatt (0.5 each); Kinderarbeit keeps them to worker slots (0.6); "allowed there only" read as these two buildings, not every engineer slot
+- F: the Volksküche ratio multiplies the rations it produces (1.25 Wassersuppe, 1.5 Ersatzkost), the food input stays as it was; the cell sheet's hourly figures follow the same factor
+- F: the Stadtkommandant cap (discontent 80) and the Bischofsstadt floor (hope 20) live in the hourly mood of people.ts, next to the other mood terms
+- F: `sign` clamps hope and discontent to 0–100 after its one-off change (Kiliansfest would otherwise overshoot)
+- F: a missing flag (Fringsen before the event) reads 'Noch nicht möglich'; the Fringsen coal comes at 08:00 whenever the law is in force, the flag only gates signing
+- F: the laws sheet lists the effects from the data ("Sofort: …", "Jede Stunde: …") under each description; the Gesetze badge shows 1 while any law can be signed
+- F: test change: the table fill of `LAW_MOOD` removed: "adds the hourly values of the signed laws" in `test/d-people.test.ts` now relies on the real law data (ersatzkost, notschicht, andacht carry the same values), the `LAW_MOOD` import and its cleanup are gone
+- G: `src/sim/data/events.ts` is a stub with the five event ids the sites queue (the g-explore test imports `EVENTS` at load); step I replaces the file with the full table
+- G: arrival pushes `{ id, at }` to `s.events.scheduled` as instructed (not `pending`, not `fired`); story consumes it; test/g-explore.test.ts assertions moved from `pending` to `scheduled` because they contradicted that
+- G: one danger roll per member, at arrival only; storm factor (×3) when arrival or return falls on a storm day (spec: "at arrival and return")
+- G: a team that loses all four members brings nothing back (no loot, no survivors), logged as bad
+- G: `residenz` also needs `altstadt` (the spec text says so, the table lists only `festung`); `altstadt` sets `tal_gesehen`, `residenz` sets `hofkeller` and `tal_gesehen` (`SiteDef.flag` may be a list)
+- G: expedition deaths use `kill` from people.ts (now exported): hope −2 like any death, the member leaves the team
+- G: mixed survivors: every third is a child, the others workers (deterministic, no extra randomness)
+- G: markers are grey (locked) only when a prerequisite is missing (`needs`, three city places); other refusals (no post, storm, teams busy) keep the marker open
+- G: map tabs use ids `stadt` / `umland`; marker labels take the name before " · " (long names may overlap, not checked visually)
+- G: test: removed the unused helper `stadtIds` in test/g-explore.test.ts (tsc `noUnusedLocals` fails the build otherwise)
+- I: the events texts sit in `src/sim/data/events.ts` with the endings (`closing`), the story logic in `story.ts`; the table's rows have their own titles (Ankunft, Abzug, …) since the spec names only senders and choices
+- I: `hamster_zurueck` is a hidden scheduled event (not a table row), its one choice rolls the 20 % loss when the sacks are unloaded
+- I: triggers fire at the first game hour at or after their time (the spec's exact hour), so a time skip cannot miss them
+- I: the expedition arrival (scheduled) and the trigger (fired check) can not both queue an event, `queueEvent` marks it fired
+- I: a choice whose `available` fails when resolved (Schweinfurt without 100 coal) is consumed with the log line 'Dieses Angebot ist nicht mehr möglich.'; the sheet greys it out, the bot still resolves choice 0
+- I: 'Vorsichtig bergen' kills a random worker (any person if none); 'Gehen lassen' removes round(15 %) random city people without death, no hope cost
+- I: mixed expellee groups use every third child (as explore does); 'Zurücklassen'/'Die Säcke abladen' etc. follow the spec numbers, the Hamster loss takes rations, not food
+- I: stamp „DRINGEND“ shows on sturm_beginnt and sturmwarnung and on every document while a warning runs
+- I: the Bilanz button calls the existing `newGame` action (it skips the title screen); the Bilanz replaces the event modal after the outcome
+- I: the return movement is kept as a float in `flags.heimkehrer` and shown rounded as „Rückkehrbewegung: n %“ in the Leute sheet
+- I: balance: `kohlengrube` coal 1.0 → 2.0 per worker-hour (production rate); the pit sits on the cold outer ring (efficiency 0.5 in winter); 1.0 and 1.5 both fail the sensible bot (cold sickness)
+- I: balance: pile amounts unchanged (tried coal piles ×1.5: no effect, the bot has no idle hands for piles)
+- I: balance: sickness rates unchanged (SICK_RISK, 1/48, 1/200, 1/36 are step D's spec and tests; lowering the 1/36 death rate broke seven step D tests)
+- I: test/balance.test.ts bot fixed (no change to its thresholds or the idle bot): engineers went to worker slots, so the Werkstatt and Sanitätsstation never got staff and no research ever finished; now the engineer buildings are staffed first
+- I: test/balance.test.ts bot: food and wood workers only while the stock is below 200 (kitchen below 150 rations), the people go to coal otherwise (food reached 1,400 and wood 575 unused); staffing is redone every hour
+- J: the menu also has the spec's Tempo line (the task list left it out); the version line is a constant `v0.1.0` in menu.ts
+- J: „Neues Spiel“ arms its second tap whenever a game is running or a save exists, so one tap cannot end a running game
+- J: autosave every 6 game hours counted from the first hour of the game; leaving or reloading the page also saves; a finished game deletes its save at once; a new game is written as the save at once
+- J: a first-game hint is shown while its check fails (no latch), so a boiler that goes out shows „Kessel anheizen“ again; the dismissal is written to the save at once
+- J: sound starts off and is switched on by „Neues Spiel“ or „Fortsetzen“ (a tap allows the AudioContext); the menu switch shows the current state
+- J: the wind follows `snowIntensity`, the hum follows `s.gen.on`, the bell rings when the pending documents grow
+- Balance: mood, discontent per pressure 1.2 → 0.7 (spec Mood, `DISC_PRESSURE`; unit tests of step D updated)
+- Balance: mood, natural discontent easing 0.15 → 0.25 per hour (`DISC_EASE`)
+- Balance: mood, hope loss per pressure 0.4 → 0.25 (`HOPE_PRESSURE`)
+- Balance: mood, calm-city hope gain 0.05 → 0.08 per hour (`HOPE_CALM`)
+- Balance: unchanged: sickness rates, production, relief, piles (the mood numbers alone met the target; step D's 1/36, 1/48 stay)
+- Balance: `test/balance.test.ts`: sensible bot needs ≥ 60 % alive, mood calm (discontent < 75, hope > 25) in ≥ 80 % of the hours and at least one death; idle bot must lose and last until day 6; new sloppy bot must reach day 20. Before: sensible 72 % alive, idle revolt day 5, sloppy revolt day 5, discontent 83-100 at the end; after: sensible 72 % alive and calm 100 %, idle ends day 6, sloppy lasts to day 32-34
+- QA: res chips show the hourly change on a second line (the coal figure was cut to „2..“); sheet head and tabs no longer shrink, the sheet body rows keep their height (map overlapped the hint text, tabs were squashed); Karte: Rhön and Bad Kissingen moved down (y 2 → 6, 8 → 15, x 48 → 46, 60 → 62) so markers are not cut at the top, Ferdinandeum label sits above its marker; screenshots in `screenshots/` come from `scripts/qa-shots.mjs`

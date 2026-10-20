@@ -1,0 +1,20 @@
+{
+  "name": "wuerzburger-kessel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:browser": "npm run build && playwright test",
+    "package": "npm run build && node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "typescript": "5.9.3",
+    "vite": "6.4.4",
+    "vite-plugin-singlefile": "2.3.4",
+    "vitest": "3.2.7"
+  }
+}
