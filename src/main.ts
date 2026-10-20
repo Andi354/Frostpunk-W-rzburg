@@ -11,6 +11,7 @@ import './ui/panels/map';
 import './ui/panels/cell';
 import './ui/panels/build';
 import './ui/panels/cell-economy';
+import './ui/panels/events';
 
 const canvas = document.getElementById('map') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;

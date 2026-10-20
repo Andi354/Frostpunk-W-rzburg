@@ -43,6 +43,7 @@ PANELS.leute = (app) => {
           <dt>Hoffnung</dt><dd>${fmt(s.hope)}</dd>
           <dt>Unmut</dt><dd class="${s.discontent >= 70 ? 'bad' : ''}">${fmt(s.discontent)}</dd>
         </dl>
+        ${s.flags.heimkehrer !== undefined ? `<p class="hint" style="margin-top:6px">Rückkehrbewegung: ${fmt(s.flags.heimkehrer)} %</p>` : ''}
         <div class="list" style="margin-top:8px">${causes.length ? causes.map((t) => `<div class="li">${esc(t)}</div>`).join('') : '<p class="hint">Im Moment keine besondere Not.</p>'}</div>
       </div>
       <div>

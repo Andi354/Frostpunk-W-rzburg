@@ -5,3 +5,4 @@ import './research';
 import './people';
 import './laws';
 import './explore';
+import './story';

@@ -126,13 +126,25 @@ function heaters(s: GameState): void {
   for (const b of s.buildings) if (b.type === 'waermestube' && b.built >= 1) b.on = s.res.coal > 80;
 }
 
-const STAFF_ORDER = ['kueche', 'jagdhuette', 'kohlengrube', 'holzfaeller', 'sanitaet', 'werkstatt', 'lazarett', 'hangar', 'truemmerbahn'];
+/** Engineer buildings first (they take only engineers), then coal, food and wood; leftover people work the piles. */
+const STAFF_ORDER = ['sanitaet', 'werkstatt', 'lazarett', 'kueche', 'kohlengrube', 'jagdhuette', 'holzfaeller', 'hangar', 'truemmerbahn'];
 
-/** Staff every finished building in priority order; whoever is left over works the coal and wood piles. */
+/** Food and wood are only worked while the stock is short; the people go to coal otherwise. */
+const STOCK_MAX: Partial<Record<string, [resource: 'food' | 'wood' | 'rations', max: number]>> = {
+  kueche: ['rations', 150],
+  jagdhuette: ['food', 200],
+  holzfaeller: ['wood', 200],
+};
+
+/** Staff every finished building again each hour in priority order; whoever is left over works the coal and wood piles. */
 function staff(s: GameState): void {
+  for (const b of s.buildings) if (b.workers.length && def(b.type).slots) assign(s, b.id, -b.workers.length);
   const piles = s.buildings.filter((b) => b.type === 'pile_coal' || b.type === 'pile_wood').sort((a, b) => (a.type < b.type ? -1 : 1));
-  for (const p of piles) if (p.workers.length) assign(s, p.id, -p.workers.length);
-  for (const type of STAFF_ORDER) {
+  const order = STAFF_ORDER.filter((type) => {
+    const limit = STOCK_MAX[type];
+    return !limit || s.res[limit[0]] < limit[1];
+  });
+  for (const type of order) {
     for (const b of s.buildings) {
       if (b.type !== type || b.built < 1) continue;
       const free = (def(type).slots ?? 0) - b.workers.length;

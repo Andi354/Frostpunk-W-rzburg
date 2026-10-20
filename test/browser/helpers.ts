@@ -5,6 +5,8 @@ export async function startGame(page: Page): Promise<void> {
   await page.evaluate(() => localStorage.clear());
   await page.goto('/');
   await page.getByRole('button', { name: 'Neues Spiel' }).click();
+  // the arrival document comes with the first hour and stops the game until it is answered
+  await page.getByRole('dialog', { name: 'Ankunft' }).getByRole('button', { name: 'An die Arbeit' }).click();
   await page.getByRole('button', { name: 'Pause' }).click();
 }
 

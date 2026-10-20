@@ -45,3 +45,18 @@
 - G: markers are grey (locked) only when a prerequisite is missing (`needs`, three city places); other refusals (no post, storm, teams busy) keep the marker open
 - G: map tabs use ids `stadt` / `umland`; marker labels take the name before " · " (long names may overlap, not checked visually)
 - G: test: removed the unused helper `stadtIds` in test/g-explore.test.ts (tsc `noUnusedLocals` fails the build otherwise)
+- I: the events texts sit in `src/sim/data/events.ts` with the endings (`closing`), the story logic in `story.ts`; the table's rows have their own titles (Ankunft, Abzug, …) since the spec names only senders and choices
+- I: `hamster_zurueck` is a hidden scheduled event (not a table row), its one choice rolls the 20 % loss when the sacks are unloaded
+- I: triggers fire at the first game hour at or after their time (the spec's exact hour), so a time skip cannot miss them
+- I: the expedition arrival (scheduled) and the trigger (fired check) can not both queue an event, `queueEvent` marks it fired
+- I: a choice whose `available` fails when resolved (Schweinfurt without 100 coal) is consumed with the log line 'Dieses Angebot ist nicht mehr möglich.'; the sheet greys it out, the bot still resolves choice 0
+- I: 'Vorsichtig bergen' kills a random worker (any person if none); 'Gehen lassen' removes round(15 %) random city people without death, no hope cost
+- I: mixed expellee groups use every third child (as explore does); 'Zurücklassen'/'Die Säcke abladen' etc. follow the spec numbers, the Hamster loss takes rations, not food
+- I: stamp „DRINGEND“ shows on sturm_beginnt and sturmwarnung and on every document while a warning runs
+- I: the Bilanz button calls the existing `newGame` action (it skips the title screen); the Bilanz replaces the event modal after the outcome
+- I: the return movement is kept as a float in `flags.heimkehrer` and shown rounded as „Rückkehrbewegung: n %“ in the Leute sheet
+- I: balance: `kohlengrube` coal 1.0 → 2.0 per worker-hour (production rate); the pit sits on the cold outer ring (efficiency 0.5 in winter); 1.0 and 1.5 both fail the sensible bot (cold sickness)
+- I: balance: pile amounts unchanged (tried coal piles ×1.5: no effect, the bot has no idle hands for piles)
+- I: balance: sickness rates unchanged (SICK_RISK, 1/48, 1/200, 1/36 are step D's spec and tests; lowering the 1/36 death rate broke seven step D tests)
+- I: test/balance.test.ts bot fixed (no change to its thresholds or the idle bot): engineers went to worker slots, so the Werkstatt and Sanitätsstation never got staff and no research ever finished; now the engineer buildings are staffed first
+- I: test/balance.test.ts bot: food and wood workers only while the stock is below 200 (kitchen below 150 rations), the people go to coal otherwise (food reached 1,400 and wood 575 unused); staffing is redone every hour
